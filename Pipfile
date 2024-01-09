@@ -12,6 +12,7 @@ plotly = "*"
 psutil = "*"
 boto3 = "*"
 fire = "*"
+pandas = "*"
 
 [requires]
 python_version = "3.8"
