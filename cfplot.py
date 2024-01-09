@@ -15,7 +15,6 @@ DEFAULT_FONT = {"family": "Open Sans, light", "color": "black", "size": 14}
 
 logging.basicConfig(level=logging.INFO)
 
-
 def format_time_from_seconds(seconds: int) -> str:
     hours, remainder = divmod(seconds, SECONDS_IN_HOUR)
     minutes, seconds = divmod(remainder, SECONDS_IN_MINUTE)
@@ -94,6 +93,7 @@ def main(stackname: str, profile: str = DEFAULT_PROFILE, region: str = DEFAULT_R
     fig = go.Figure()
     try:
         events = retrieve_cf_events(stackname=stackname, profile=profile, region=region)
+        logging.info(f"There are {len(events)} event(s).")
         events.sort(key=get_timestamp)
         start_time = events[0]["Timestamp"]
         process_events(events, start_time, data, fig)
@@ -139,7 +139,7 @@ def update_data_for_event(event, data):
         data[stack_name][logical_resource_id].update({"start": timestamp})
     elif resource_status == "CREATE_IN_PROGRESS" and resource_status_reason == "":
         data[stack_name][logical_resource_id].update({"identified": timestamp})
-    elif resource_status == "CREATE_COMPLETE":
+    elif resource_status == "CREATE_COMPLETE" or resource_status == "UPDATE_COMPLETE":
         data[stack_name][logical_resource_id].update(
             {
                 "end": timestamp,
@@ -154,7 +154,12 @@ def update_data_for_event(event, data):
 
 
 def display_figure(fig, data, events, stackname):
-    total_time = format_time_from_seconds(data[stackname][stackname]["duration"].seconds)
+    duration = data[stackname][stackname].get("duration")
+    if (duration):
+        total_time = format_time_from_seconds(duration.seconds)
+    else:
+        logging.warning("Duration was not found on the data object.") 
+        total_time = 0
     fig.update_layout(
         title={
             "text": f'<span style="color:#000000">CloudFormation Waterfall - {stackname}<br /><b>Total Time: {total_time}</b></span>'
