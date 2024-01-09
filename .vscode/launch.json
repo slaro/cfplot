@@ -1,0 +1,41 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: cfplot.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/cfplot.py",
+            "args" : ["--stackname", "${input:stackName}", "--region", "${input:region}", "--profile", "${input:awsProfile}"],
+            "console": "integratedTerminal"
+        }
+    ],
+    "inputs": [
+        {
+            "id": "stackName",
+            "description": "Provide a CloudFormation stack name to inspect.",
+            "type": "promptString",
+            "default": "my-stack"
+        },
+        {
+            "id": "region",
+            "description": "The region where the stack exists.",
+            "type": "pickString",
+            "options": [
+                "us-east-1",
+                "us-east-2",
+                "us-west-2"
+            ],
+            "default": "us-east-2"
+        },
+        {
+            "id": "awsProfile",
+            "description": "A profile from your AWS CLI config.",
+            "type": "promptString",
+            "default": "default"
+        }
+    ]
+}
